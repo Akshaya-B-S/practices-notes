@@ -1,0 +1,122 @@
+#Data cleaning and preparation with pandas
+
+#handling missing values
+#methods
+  *drop missing values 
+     eg:df=df.dropna() #droping row missing values
+        df=df.dropna(axis=1) #droping column missing values
+  *Fill missing values
+     eg: df["col_name"] = df.["col_name"].fillna(0)
+   two types of filling 
+      *forward filling eg: df.fillna(method="ffill")
+      *backward filling eg: df.fillna(method="bfill")
+  *Interpolation - add value based on interpolate
+     eg: df["col_name"] = df.["col_name"].interpolate()
+
+#Data Transformation
+  *Rename column
+    eg: df =df.rename(columns:{"oldname":"newname"})
+  *Changing datatype
+    eg: df["col_name"] = df.["col_name"].astype("float")
+        df["col_name"] = pd.to_datetime(df["col_name"])  
+  *create or modify column
+    eg: df["new_column"] = df["existing_column"]*2
+
+#Combining and merging Dataframes
+   *concatenation
+    eg: combine = pd.concat([df1,df2],axis=0)  #row wise
+        combine = pd.concat([df1,df2],axis=1)  #column wise
+   *merge - merging based on key or condition
+    eg: merged = pd.merge(df1,df2, on="common_column present in both df") #merge by common columns
+        merged = pd.merge(df1,df2, how="left" , on="common_col")   #left join
+        merged = pd.merge(df1,df2, how="inner" , on="common_col")  #inner join
+   *joining using index alignment
+     eg: joined = df1.join(df2 , how ="inner")
+
+#Hands on exercises:
+1)Clean a dataset by handling missing values and renaming columns
+import numpy as np
+import pandas as pd
+data= {
+    "Name": ["Alice", "Bob", np.nan , "David"],
+    "Age": [25,np.nan, 30, 35],
+    "Score": [85, 90, np.nan, 88]
+    }
+df = pd.DataFrame(data)
+print("Original Dataset\n", df)
+
+df["Age"] =df["Age"].fillna(df["Age"].mean())
+df["Score"] = df["Score"].interpolate()
+
+print("Dataset\n",df)
+
+df =df.rename(columns ={"Name" :"Student_name" , "Score": "Exam:Score"})
+print("Dataset\n",df)
+
+Output:
+Original Dataset
+     Name   Age  Score
+0  Alice  25.0   85.0
+1    Bob   NaN   90.0
+2    NaN  30.0    NaN
+3  David  35.0   88.0
+Dataset
+     Name   Age  Score
+0  Alice  25.0   85.0
+1    Bob  30.0   90.0
+2    NaN  30.0   89.0
+3  David  35.0   88.0
+Dataset
+   Student_name   Age  Exam:Score
+0        Alice  25.0        85.0
+1          Bob  30.0        90.0
+2          NaN  30.0        89.0
+3        David  35.0        88.0
+
+2)Merge two datasets and perform data transformations
+
+import numpy as np
+import pandas as pd
+
+df1=pd.DataFrame({
+    "ID": [1,2,3],
+    "Name": ["Alice", "Bob", "Charlie"],
+    "Age": [25,30,35]
+})
+df2 = pd.DataFrame({
+    "ID":[1,2,3],
+    "Score":[85,90,88]
+})
+
+print("Dataset 1:\n" , df1)
+print("Dataset 2:\n",df2)
+
+#merging two dataset
+merged = pd.merge(df1,df2, how = "inner" , on="ID")
+print("Merged Dataset:\n",merged)
+
+#add new column in the dataset
+merged["Score_Percentage"] = (merged["Score"]/100)*100
+print("Transformed dataset:\n", merged)
+
+Output:
+     Dataset 1:
+    ID     Name  Age
+0   1    Alice   25
+1   2      Bob   30
+2   3  Charlie   35
+Dataset 2:
+    ID  Score
+0   1     85
+1   2     90
+2   3     88
+Merged Dataset:
+    ID     Name  Age  Score
+0   1    Alice   25     85
+1   2      Bob   30     90
+2   3  Charlie   35     88
+Transformed dataset:
+    ID     Name  Age  Score  Score_Percentage
+0   1    Alice   25     85              85.0
+1   2      Bob   30     90              90.0
+2   3  Charlie   35     88              88.0
